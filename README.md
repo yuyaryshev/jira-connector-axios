@@ -1,3 +1,12 @@
+# jira-connector-axios
+
+Forked version of unmantained jira-connector-axios
+
+Changes I made:
+- 'request' library replaced with 'axios'
+
+Below is original author readme
+
 # Thanks All!
 
 I no longer have the time, energy or interest to maintain this project, so I'm going to be archiving it.
