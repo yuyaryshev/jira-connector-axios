@@ -1,6 +1,6 @@
 import { Callback } from './callback';
 import { Config } from './config';
-import { CoreOptions } from 'request';
+import { AxiosRequestConfig } from 'axios';
 import {
   ApplicationProperties,
   Attachment,
@@ -86,7 +86,7 @@ export default class JiraClient {
   buildAuthURL(path: string, forcedVersion?: number | string): string;
   buildURL(path: string, forcedVersion?: number | string): string;
   buildWebhookURL(path: string, forcedVersion?: number | string): string;
-  makeRequest(options: CoreOptions, callback?: Callback, successString?: string): Promise<any>;
+  makeRequest(options: AxiosRequestConfig, callback?: Callback, successString?: string): Promise<any>;
 
   static oauth_util: {
     getAuthorizeURL(config: any, callback: any): any,

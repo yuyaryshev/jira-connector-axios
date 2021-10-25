@@ -4,7 +4,7 @@
 const url = require('url');
 
 // Npm packages
-const request = require('request');
+const axios = require('axios');
 const jwt = require('atlassian-jwt');
 const queryString = require('query-string');
 
@@ -182,7 +182,7 @@ var JiraClient = module.exports = function (config) {
     this.authApiVersion = '1';
     this.webhookApiVersion = '1.0';
     this.promise = config.promise || Promise;
-    this.requestLib = config.request || request;
+    this.requestLib = config.request || axios;
     this.rejectUnauthorized = config.rejectUnauthorized;
 
     if (config.oauth) {
@@ -424,6 +424,7 @@ var JiraClient = module.exports = function (config) {
      */
     this.makeRequest = function (options, callback, successString) {
         let requestLib = this.requestLib;
+        options.url=options.uri;
         options.rejectUnauthorized = this.rejectUnauthorized;
         options.strictSSL = this.strictSSL;
         options.timeout = this.timeout;

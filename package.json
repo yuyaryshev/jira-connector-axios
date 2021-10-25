@@ -1,6 +1,6 @@
 {
-  "name": "jira-connector",
-  "version": "3.1.0",
+  "name": "jira-connector-axios",
+  "version": "3.10.0",
   "description": "Easy to use NodeJS wrapper for the Jira REST API.",
   "keywords": [
     "JIRA",
@@ -17,21 +17,17 @@
   "main": "./index.js",
   "types": "./types/index.d.ts",
   "scripts": {
-    "prepublishOnly": "npm run test",
-    "test": "dtslint types"
   },
-  "author": "Caleb Brinkman <floralvikings@gmail.com>",
+  "author": "Yuri Yaryshev, Caleb Brinkman <floralvikings@gmail.com>",
   "license": "MIT",
   "devDependencies": {
-    "@types/request": "^2.48.4",
-    "dtslint": "^2.0.2"
   },
   "dependencies": {
     "atlassian-jwt": "^1.0.2",
+    "axios": "^0.23.0",
     "mime-types": "^2.1.25",
     "oauth": "^0.9.15",
-    "query-string": "^6.9.0",
-    "request": "^2.88.0"
+    "query-string": "^6.9.0"
   },
   "repository": {
     "type": "git",
