@@ -1,69 +1,69 @@
 "use strict";
 
 // Core packages
-const url = require('url');
+const url = require("url");
 
 // Npm packages
-const axios = require('axios');
-const jwt = require('atlassian-jwt');
-const queryString = require('query-string');
+const axios = require("axios");
+const jwt = require("atlassian-jwt");
+const queryString = require("query-string");
 
 // Custom packages
-var applicationProperties = require('./api/application-properties');
-var attachment = require('./api/attachment');
-var auditing = require('./api/auditing');
-var auth = require('./api/auth');
-var avatar = require('./api/avatar');
-var backlog = require('./api/backlog');
-var board = require('./api/board');
-var comment = require('./api/comment');
-var component = require('./api/component');
-var customFieldOption = require('./api/customFieldOption');
-var dashboard = require('./api/dashboard');
-const developmentInformation = require('./api/developmentInformation');
-var epic = require('./api/epic');
-var errorStrings = require('./lib/error');
-var field = require('./api/field');
-var filter = require('./api/filter');
-var group = require('./api/group');
-var groupUserPicker = require('./api/groupUserPicker');
-var groups = require('./api/groups');
-var issue = require('./api/issue');
-var issueLink = require('./api/issueLink');
-var issueLinkType = require('./api/issueLinkType');
-var issueType = require('./api/issueType');
-var jql = require('./api/jql');
-var labels = require('./api/labels');
-var licenseRole = require('./api/licenseRole');
-var licenseValidator = require('./api/licenseValidator');
-var myPermissions = require('./api/myPermissions');
-var myPreferences = require('./api/myPreferences');
-var myself = require('./api/myself');
-var oauth_util = require('./lib/oauth_util');
-var password = require('./api/password');
-var permissions = require('./api/permissions');
-var permissionScheme = require('./api/permission-scheme');
-var priority = require('./api/priority');
-var project = require('./api/project');
-var projectCategory = require('./api/projectCategory');
-var projectValidate = require('./api/projectValidate');
-var reindex = require('./api/reindex');
-var resolution = require('./api/resolution');
-var roles = require('./api/roles');
-var screens = require('./api/screens');
-var search = require('./api/search');
-var securityLevel = require('./api/securityLevel');
-var serverInfo = require('./api/serverInfo');
-var settings = require('./api/settings');
-var sprint = require('./api/sprint');
-var status = require('./api/status');
-var statusCategory = require('./api/statusCategory');
-var user = require('./api/user');
-var version = require('./api/version');
-var webhook = require('./api/webhook');
-var workflow = require('./api/workflow');
-var workflowScheme = require('./api/workflowScheme');
-var worklog = require('./api/worklog');
+var applicationProperties = require("./api/application-properties");
+var attachment = require("./api/attachment");
+var auditing = require("./api/auditing");
+var auth = require("./api/auth");
+var avatar = require("./api/avatar");
+var backlog = require("./api/backlog");
+var board = require("./api/board");
+var comment = require("./api/comment");
+var component = require("./api/component");
+var customFieldOption = require("./api/customFieldOption");
+var dashboard = require("./api/dashboard");
+const developmentInformation = require("./api/developmentInformation");
+var epic = require("./api/epic");
+var errorStrings = require("./lib/error");
+var field = require("./api/field");
+var filter = require("./api/filter");
+var group = require("./api/group");
+var groupUserPicker = require("./api/groupUserPicker");
+var groups = require("./api/groups");
+var issue = require("./api/issue");
+var issueLink = require("./api/issueLink");
+var issueLinkType = require("./api/issueLinkType");
+var issueType = require("./api/issueType");
+var jql = require("./api/jql");
+var labels = require("./api/labels");
+var licenseRole = require("./api/licenseRole");
+var licenseValidator = require("./api/licenseValidator");
+var myPermissions = require("./api/myPermissions");
+var myPreferences = require("./api/myPreferences");
+var myself = require("./api/myself");
+var oauth_util = require("./lib/oauth_util");
+var password = require("./api/password");
+var permissions = require("./api/permissions");
+var permissionScheme = require("./api/permission-scheme");
+var priority = require("./api/priority");
+var project = require("./api/project");
+var projectCategory = require("./api/projectCategory");
+var projectValidate = require("./api/projectValidate");
+var reindex = require("./api/reindex");
+var resolution = require("./api/resolution");
+var roles = require("./api/roles");
+var screens = require("./api/screens");
+var search = require("./api/search");
+var securityLevel = require("./api/securityLevel");
+var serverInfo = require("./api/serverInfo");
+var settings = require("./api/settings");
+var sprint = require("./api/sprint");
+var status = require("./api/status");
+var statusCategory = require("./api/statusCategory");
+var user = require("./api/user");
+var version = require("./api/version");
+var webhook = require("./api/webhook");
+var workflow = require("./api/workflow");
+var workflowScheme = require("./api/workflowScheme");
+var worklog = require("./api/worklog");
 
 /**
  * @callback callback
@@ -166,21 +166,21 @@ var worklog = require('./api/worklog');
  *      Default - require('request').
  */
 
-var JiraClient = module.exports = function (config) {
+var JiraClient = (module.exports = function (config) {
     if (!config.host) {
         throw new Error(errorStrings.NO_HOST_ERROR);
     }
 
     this.host = config.host;
     this.timeout = config.timeout;
-    this.protocol = config.protocol ? config.protocol : 'https';
-    this.path_prefix = config.path_prefix ? config.path_prefix : '/';
+    this.protocol = config.protocol ? config.protocol : "https";
+    this.path_prefix = config.path_prefix ? config.path_prefix : "/";
     this.port = config.port;
     this.apiVersion = 2;
-    this.strictSSL = config.hasOwnProperty('strictSSL') ? config.strictSSL : true;
-    this.agileApiVersion = '1.0';
-    this.authApiVersion = '1';
-    this.webhookApiVersion = '1.0';
+    this.strictSSL = config.hasOwnProperty("strictSSL") ? config.strictSSL : true;
+    this.agileApiVersion = "1.0";
+    this.authApiVersion = "1";
+    this.webhookApiVersion = "1.0";
     this.promise = config.promise || Promise;
     this.requestLib = config.request || axios;
     this.rejectUnauthorized = config.rejectUnauthorized;
@@ -197,13 +197,12 @@ var JiraClient = module.exports = function (config) {
         }
 
         this.oauthConfig = config.oauth;
-        this.oauthConfig.signature_method = 'RSA-SHA1';
-
+        this.oauthConfig.signature_method = "RSA-SHA1";
     } else if (config.basic_auth) {
         if (config.basic_auth.base64) {
             this.basic_auth = {
-                base64: config.basic_auth.base64
-            }
+                base64: config.basic_auth.base64,
+            };
         } else if (config.basic_auth.api_token || config.basic_auth.email) {
             if (!config.basic_auth.email) {
                 throw new Error(errorStrings.NO_EMAIL_ERROR);
@@ -213,7 +212,9 @@ var JiraClient = module.exports = function (config) {
 
             this.basic_auth = {
                 user: config.basic_auth.email,
-                pass: config.basic_auth.api_token
+                pass: config.basic_auth.api_token,
+                username: config.basic_auth.email,
+                password: config.basic_auth.api_token,
             };
         } else {
             if (!config.basic_auth.username) {
@@ -224,23 +225,25 @@ var JiraClient = module.exports = function (config) {
 
             this.basic_auth = {
                 user: config.basic_auth.username,
-                pass: config.basic_auth.password
+                pass: config.basic_auth.password,
+                username: config.basic_auth.username,
+                password: config.basic_auth.password,
             };
         }
     } else if (config.jwt) {
-      if (config.jwt.secret && config.jwt.iss) {
-        this.jwt = {
-          iss: config.jwt.iss,
-          secret: config.jwt.secret,
-          expiry_time_seconds: config.jwt.expiry_time_seconds || 3 * 60
-        };
-      } else {
-        if (!config.jwt.secret) {
-          throw new Error(errorStrings.NO_JWT_SECRET_KEY_ERROR);
-        } else if (!config.jwt.iss) {
-          throw new Error(errorStrings.NO_JWT_ISS_KEY_ERROR);
+        if (config.jwt.secret && config.jwt.iss) {
+            this.jwt = {
+                iss: config.jwt.iss,
+                secret: config.jwt.secret,
+                expiry_time_seconds: config.jwt.expiry_time_seconds || 3 * 60,
+            };
+        } else {
+            if (!config.jwt.secret) {
+                throw new Error(errorStrings.NO_JWT_SECRET_KEY_ERROR);
+            } else if (!config.jwt.iss) {
+                throw new Error(errorStrings.NO_JWT_ISS_KEY_ERROR);
+            }
         }
-      }
     }
 
     if (config.cookie_jar) {
@@ -300,10 +303,9 @@ var JiraClient = module.exports = function (config) {
     this.workflow = new workflow(this);
     this.workflowScheme = new workflowScheme(this);
     this.worklog = new worklog(this);
-};
+});
 
 (function () {
-
     /**
      * Simple utility to build a REST endpoint URL for the Jira API.
      *
@@ -314,19 +316,19 @@ var JiraClient = module.exports = function (config) {
      * @returns {string} The constructed URL.
      */
     this.buildURL = function (path, forcedVersion) {
-        var apiBasePath = this.path_prefix + 'rest/api/';
+        var apiBasePath = this.path_prefix + "rest/api/";
         var version = forcedVersion || this.apiVersion;
         var requestUrl = url.format({
             protocol: this.protocol,
             hostname: this.host,
             port: this.port,
-            pathname: apiBasePath + version + path
+            pathname: apiBasePath + version + path,
         });
 
         return decodeURIComponent(requestUrl);
     };
 
-     /**
+    /**
      * Simple utility to build a REST endpoint URL for the Jira API without prefixes.
      *
      * @method buildAbstractURL
@@ -334,17 +336,17 @@ var JiraClient = module.exports = function (config) {
      * @param path The path of the URL without concern for the root of the REST API.
      * @returns {string} The constructed URL.
      */
-    this.buildAbstractURL = function(path) {
-      const apiBasePath = this.path_prefix + 'rest/';
-      const requestUrl = url.format({
-          protocol: this.protocol,
-          hostname: this.host,
-          port: this.port,
-          pathname: apiBasePath + path
-      });
+    this.buildAbstractURL = function (path) {
+        const apiBasePath = this.path_prefix + "rest/";
+        const requestUrl = url.format({
+            protocol: this.protocol,
+            hostname: this.host,
+            port: this.port,
+            pathname: apiBasePath + path,
+        });
 
-      return decodeURIComponent(requestUrl);
-    }
+        return decodeURIComponent(requestUrl);
+    };
 
     /**
      * Simple utility to build a REST endpoint URL for the Jira Agile API.
@@ -356,13 +358,13 @@ var JiraClient = module.exports = function (config) {
      * @returns {string} The constructed URL.
      */
     this.buildAgileURL = function (path, forcedVersion) {
-        var apiBasePath = this.path_prefix + 'rest/agile/';
+        var apiBasePath = this.path_prefix + "rest/agile/";
         var version = forcedVersion || this.agileApiVersion;
         var requestUrl = url.format({
             protocol: this.protocol,
             hostname: this.host,
             port: this.port,
-            pathname: apiBasePath + version + path
+            pathname: apiBasePath + version + path,
         });
 
         return decodeURIComponent(requestUrl);
@@ -378,13 +380,13 @@ var JiraClient = module.exports = function (config) {
      * @returns {string} The constructed URL.
      */
     this.buildAuthURL = function (path, forcedVersion) {
-        var apiBasePath = this.path_prefix + 'rest/auth/';
+        var apiBasePath = this.path_prefix + "rest/auth/";
         var version = forcedVersion || this.authApiVersion;
         var requestUrl = url.format({
             protocol: this.protocol,
             hostname: this.host,
             port: this.port,
-            pathname: apiBasePath + version + path
+            pathname: apiBasePath + version + path,
         });
 
         return decodeURIComponent(requestUrl);
@@ -400,13 +402,13 @@ var JiraClient = module.exports = function (config) {
      * @returns {string} The constructed URL.
      */
     this.buildWebhookURL = function (path, forcedVersion) {
-        var apiBasePath = this.path_prefix + 'rest/webhooks/';
+        var apiBasePath = this.path_prefix + "rest/webhooks/";
         var version = forcedVersion || this.webhookApiVersion;
         var requestUrl = url.format({
             protocol: this.protocol,
             hostname: this.host,
             port: this.port,
-            pathname: apiBasePath + version + path
+            pathname: apiBasePath + version + path,
         });
 
         return decodeURIComponent(requestUrl);
@@ -424,7 +426,7 @@ var JiraClient = module.exports = function (config) {
      */
     this.makeRequest = function (options, callback, successString) {
         let requestLib = this.requestLib;
-        options.url=options.uri;
+        options.url = options.uri;
         options.rejectUnauthorized = this.rejectUnauthorized;
         options.strictSSL = this.strictSSL;
         options.timeout = this.timeout;
@@ -434,9 +436,9 @@ var JiraClient = module.exports = function (config) {
         } else if (this.basic_auth) {
             if (this.basic_auth.base64) {
                 if (!options.headers) {
-                    options.headers = {}
+                    options.headers = {};
                 }
-                options.headers['Authorization'] = 'Basic ' + this.basic_auth.base64
+                options.headers["Authorization"] = "Basic " + this.basic_auth.base64;
             } else {
                 options.auth = this.basic_auth;
             }
@@ -444,124 +446,50 @@ var JiraClient = module.exports = function (config) {
             const pathname = new URL(options.uri).pathname;
             const nowInSeconds = Math.floor(Date.now() / 1000);
             const queryParam = queryString.parse(queryString.stringify(options.qs));
-            const jwtToken = jwt.encode({
-              iss: this.jwt.iss,
-              iat: nowInSeconds,
-              exp: nowInSeconds + this.jwt.expiry_time_seconds,
-              qsh: jwt.createQueryStringHash({
-                method: options.method,
-                pathname,
-                query: queryParam || {}
-              })
-            }, this.jwt.secret);
+            const jwtToken = jwt.encode(
+                {
+                    iss: this.jwt.iss,
+                    iat: nowInSeconds,
+                    exp: nowInSeconds + this.jwt.expiry_time_seconds,
+                    qsh: jwt.createQueryStringHash({
+                        method: options.method,
+                        pathname,
+                        query: queryParam || {},
+                    }),
+                },
+                this.jwt.secret,
+            );
 
             if (!options.headers) {
-              options.headers = {};
+                options.headers = {};
             }
-            options.headers['Authorization'] = `JWT ${jwtToken}`;
+            options.headers["Authorization"] = `JWT ${jwtToken}`;
         }
 
         if (this.cookie_jar) {
             options.jar = this.cookie_jar;
         }
 
-        if (callback) {
-            requestLib(options, function (err, response, body) {
-                if (
-                    err ||
-                    response.statusCode < 200 ||
-                    response.statusCode > 399
-                ) {
-                    return callback(err ? err : body, null, response);
-                }
+        return (async () => {
+            let response = await requestLib(options);
 
-                if (typeof body === 'string') {
-                    try {
-                        body = JSON.parse(body);
-                    } catch (jsonErr) {
-                        return callback(jsonErr, null, response);
-                    }
-                }
+            // Saving error
+            let error = response.statusCode < 200 || response.statusCode > 399;
+            if (response.statusCode < 200 || response.statusCode > 399) {
+                const e = new Error(`CODE00000000 Invalid response statusCode=${response.statusCode}`);
+                e.requestOptions = options;
+                throw e;
+            }
 
-                return callback(null, successString ? successString : body, response);
-            });
-        } else if (this.promise) {
-            return new this.promise(function (resolve, reject) {
-                var req = requestLib(options);
-                var requestObj = null;
+            if (callback) {
+                callback(null, response.data, response);
+            }
 
-                req.on('request', function (request) {
-                    requestObj = request;
-                });
-
-                req.on('response', function (response) {
-                    // Saving error
-                    var error = response.statusCode < 200 || response.statusCode > 399;
-
-                    // Collecting data
-                    var body = [];
-                    var push = body.push.bind(body);
-                    response.on('data', push);
-
-                    // Data collected
-                    response.on('end', function () {
-                        var result = body.join('');
-
-                        // Parsing JSON
-                        if (result[0] === '[' || result[0] === '{') {
-                            try {
-                                result = JSON.parse(result);
-                            } catch (e) {
-                                // nothing to do
-                            }
-                        }
-
-                        if (error) {
-                            response.body = result;
-                            if (options.debug) {
-                                reject({
-                                    result: JSON.stringify(response),
-                                    debug: {
-                                        options: options,
-                                        request: {
-                                            headers: requestObj._headers,
-                                        },
-                                        response: {
-                                            headers: response.headers,
-                                        },
-                                    }
-                                });
-                            } else {
-                                reject(JSON.stringify(response));
-                            }
-                            return;
-                        }
-
-                        if (options.debug) {
-                            resolve({
-                                result,
-                                debug: {
-                                    options: options,
-                                    request: {
-                                        headers: requestObj._headers,
-                                    },
-                                    response: {
-                                        headers: response.headers,
-                                    },
-                                }
-                            });
-                        } else {
-                            resolve(result);
-                        }
-                    });
-                });
-
-                req.on('error', reject);
-            });
-        }
+            return response.data;
+        })();
     };
-}).call(JiraClient.prototype);
+}.call(JiraClient.prototype));
 
-JiraClient.oauth_util = require('./lib/oauth_util');
+JiraClient.oauth_util = require("./lib/oauth_util");
 
 exports.oauth_util = oauth_util;
