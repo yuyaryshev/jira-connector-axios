@@ -182,7 +182,6 @@ var JiraClient = (module.exports = function (config) {
     this.authApiVersion = "1";
     this.webhookApiVersion = "1.0";
     this.promise = config.promise || Promise;
-    this.requestLib = config.request || axios;
     this.rejectUnauthorized = config.rejectUnauthorized;
 
     if (config.oauth) {
@@ -305,6 +304,25 @@ var JiraClient = (module.exports = function (config) {
     this.worklog = new worklog(this);
 });
 
+function removePasswords(obj) {
+    if (obj) {
+        if (obj.pass) {
+            delete obj.pass;
+        }
+        if (obj.password) {
+            delete obj.password;
+        }
+        if (obj.basic_auth) {
+            if (obj.basic_auth.pass) {
+                delete obj.basic_auth.pass;
+            }
+            if (obj.basic_auth.password) {
+                delete obj.basic_auth.password;
+            }
+        }
+    }
+}
+
 (function () {
     /**
      * Simple utility to build a REST endpoint URL for the Jira API.
@@ -425,11 +443,21 @@ var JiraClient = (module.exports = function (config) {
      * @return {Promise} Resolved with APIs response or rejected with error
      */
     this.makeRequest = function (options, callback, successString) {
-        let requestLib = this.requestLib;
         options.url = options.uri;
         options.rejectUnauthorized = this.rejectUnauthorized;
         options.strictSSL = this.strictSSL;
         options.timeout = this.timeout;
+        if (options.body) {
+            options.data = options.body;
+            delete options.body;
+        }
+
+        if (!options.headers) {
+            options.headers = {};
+        }
+
+        // options.headers["Content-Type"] = "application/json";
+        options.headers["accept"] = "application/json";
 
         if (this.oauthConfig) {
             options.oauth = this.oauthConfig;
@@ -460,9 +488,6 @@ var JiraClient = (module.exports = function (config) {
                 this.jwt.secret,
             );
 
-            if (!options.headers) {
-                options.headers = {};
-            }
             options.headers["Authorization"] = `JWT ${jwtToken}`;
         }
 
@@ -471,18 +496,20 @@ var JiraClient = (module.exports = function (config) {
         }
 
         return (async () => {
-            let response = await requestLib(options);
-
-            // Saving error
-            let error = response.statusCode < 200 || response.statusCode > 399;
+            let response = await axios(options);
+            removePasswords(response.data);
             if (response.statusCode < 200 || response.statusCode > 399) {
                 const e = new Error(`CODE00000000 Invalid response statusCode=${response.statusCode}`);
                 e.requestOptions = options;
-                throw e;
+                if (callback) {
+                    callback(e, undefined, response);
+                } else {
+                    throw e;
+                }
             }
 
             if (callback) {
-                callback(null, response.data, response);
+                callback(null, successString !== undefined ? successString : response.data, response);
             }
 
             return response.data;

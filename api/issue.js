@@ -1,8 +1,10 @@
 "use strict";
+var fs = eval('require')("fs"); // Should be null if used in browser
+if (typeof FormData === "undefined") { // Should not enter here if used in browser
+    global.FormData = eval('require')("form-data");
+}
 
-var fs = require('fs');
-var mime = require('mime-types');
-var errorStrings = require('./../lib/error');
+var errorStrings = require("./../lib/error");
 
 module.exports = IssueClient;
 
@@ -32,18 +34,18 @@ function IssueClient(jiraClient) {
      * @return {Promise} Resolved when the issue estimation has been retrieved.
      */
     this.getIssueEstimation = function (opts, callback) {
-        var endpoint = '/issue/' + (opts.issueId || opts.issueKey) + '/estimation';
+        var endpoint = "/issue/" + (opts.issueId || opts.issueKey) + "/estimation";
         var options = {
             uri: this.jiraClient.buildAgileURL(endpoint),
-            method: 'GET',
+            method: "GET",
             json: true,
             followAllRedirects: true,
             qs: {
                 boardId: opts.boardId,
                 filter: opts.filter,
                 startAt: opts.startAt,
-                maxResults: opts.maxResults
-            }
+                maxResults: opts.maxResults,
+            },
         };
 
         return this.jiraClient.makeRequest(options, callback);
@@ -67,21 +69,21 @@ function IssueClient(jiraClient) {
      * @return {Promise} Resolved when the issue estimation has been created.
      */
     this.setIssueEstimation = function (opts, callback) {
-        var endpoint = '/issue/' + (opts.issueId || opts.issueKey) + '/estimation';
+        var endpoint = "/issue/" + (opts.issueId || opts.issueKey) + "/estimation";
         var options = {
             uri: this.jiraClient.buildAgileURL(endpoint),
-            method: 'PUT',
+            method: "PUT",
             json: true,
             followAllRedirects: true,
             body: {
                 value: opts.value,
                 filter: opts.filter,
                 startAt: opts.startAt,
-                maxResults: opts.maxResults
+                maxResults: opts.maxResults,
             },
             qs: {
-                boardId: opts.boardId
-            }
+                boardId: opts.boardId,
+            },
         };
 
         return this.jiraClient.makeRequest(options, callback);
@@ -99,11 +101,11 @@ function IssueClient(jiraClient) {
      */
     this.setIssueRanks = function (ranking, callback) {
         var options = {
-            uri: this.jiraClient.buildAgileURL('/issue/rank'),
-            method: 'PUT',
+            uri: this.jiraClient.buildAgileURL("/issue/rank"),
+            method: "PUT",
             json: true,
             followAllRedirects: true,
-            body: ranking
+            body: ranking,
         };
 
         return this.jiraClient.makeRequest(options, callback);
@@ -131,11 +133,11 @@ function IssueClient(jiraClient) {
      */
     this.createIssue = function (issue, callback) {
         var options = {
-            uri: this.jiraClient.buildURL('/issue'),
-            method: 'POST',
+            uri: this.jiraClient.buildURL("/issue"),
+            method: "POST",
             followAllRedirects: true,
             json: true,
-            body: issue
+            body: issue,
         };
 
         return this.jiraClient.makeRequest(options, callback);
@@ -176,8 +178,8 @@ function IssueClient(jiraClient) {
      */
     this.getCreateMetadata = function (opts, callback) {
         var options = {
-            uri: this.jiraClient.buildURL('/issue/createmeta'),
-            method: 'GET',
+            uri: this.jiraClient.buildURL("/issue/createmeta"),
+            method: "GET",
             followAllRedirects: true,
             json: true,
             qs: {
@@ -185,8 +187,8 @@ function IssueClient(jiraClient) {
                 projectKeys: opts.projectKeys,
                 issuetypeIds: opts.issuetypeIds,
                 issuetypeNames: opts.issuetypeNames,
-                expand: opts.expand
-            }
+                expand: opts.expand,
+            },
         };
 
         return this.jiraClient.makeRequest(options, callback);
@@ -208,11 +210,11 @@ function IssueClient(jiraClient) {
      */
     this.bulkCreate = function (issues, callback) {
         var options = {
-            uri: this.jiraClient.buildURL('/issue/bulk'),
-            method: 'POST',
+            uri: this.jiraClient.buildURL("/issue/bulk"),
+            method: "POST",
             followAllRedirects: true,
             json: true,
-            body: issues
+            body: issues,
         };
 
         return this.jiraClient.makeRequest(options, callback);
@@ -259,20 +261,20 @@ function IssueClient(jiraClient) {
      */
     this.getIssue = function (opts, callback) {
         if (!opts.agile) {
-            var options = this.buildRequestOptions(opts, '', 'GET');
+            var options = this.buildRequestOptions(opts, "", "GET");
         } else {
-            var endpoint = '/issue/' + (opts.issueId || opts.issueKey);
+            var endpoint = "/issue/" + (opts.issueId || opts.issueKey);
             var options = {
                 uri: this.jiraClient.buildAgileURL(endpoint),
-                method: 'GET',
+                method: "GET",
                 json: true,
                 followAllRedirects: true,
                 qs: {
                     filter: opts.filter,
                     startAt: opts.startAt,
                     maxResults: opts.maxResults,
-                    expand: opts.expand
-                }
+                    expand: opts.expand,
+                },
             };
         }
 
@@ -296,9 +298,9 @@ function IssueClient(jiraClient) {
      * @return {Promise} Resolved when data has been retrieved
      */
     this.deleteIssue = function (opts, callback) {
-        var options = this.buildRequestOptions(opts, '', 'DELETE', null, { deleteSubtasks: opts.deleteSubtasks });
+        var options = this.buildRequestOptions(opts, "", "DELETE", null, { deleteSubtasks: opts.deleteSubtasks });
 
-        return this.jiraClient.makeRequest(options, callback, 'Issue Deleted');
+        return this.jiraClient.makeRequest(options, callback, "Issue Deleted");
     };
 
     /**
@@ -334,23 +336,19 @@ function IssueClient(jiraClient) {
      */
     this.editIssue = function (opts, callback) {
         var options = {
-            uri: this.jiraClient.buildURL('/issue/' + (opts.issueId || opts.issueKey)),
-            method: 'PUT',
+            uri: this.jiraClient.buildURL("/issue/" + (opts.issueId || opts.issueKey)),
+            method: "PUT",
             json: true,
             followAllRedirects: true,
-            qs: Object.assign(
-                {},
-                opts,
-                {
-                    issueKey: undefined,
-                    issueId: undefined,
-                    issue: undefined
-                }
-            ),
-            body: opts.issue || opts.body
+            qs: Object.assign({}, opts, {
+                issueKey: undefined,
+                issueId: undefined,
+                issue: undefined,
+            }),
+            body: opts.issue || opts.body,
         };
 
-        return this.jiraClient.makeRequest(options, callback, 'Issue Updated');
+        return this.jiraClient.makeRequest(options, callback, "Issue Updated");
     };
 
     /**
@@ -361,7 +359,7 @@ function IssueClient(jiraClient) {
      * See {@link https://developer.atlassian.com/cloud/jira/platform/deprecation-notice-user-privacy-api-migration-guide/}
      * @method assignIssue
      * @memberof IssueClient#
-     * @param {Object} opts use assignee name or accountId to assign the issue 
+     * @param {Object} opts use assignee name or accountId to assign the issue
      * @param {string} [opts.issueId] The id of the issue.  EX: 10002
      * @param {string} [opts.issueKey] The Key of the issue.  EX: JWR-3
      * @param {string} [opts.assignee] The name of the user to whom to assign the issue
@@ -371,13 +369,13 @@ function IssueClient(jiraClient) {
      */
     this.assignIssue = function (opts, callback) {
         var assigneeIdOrName = opts.accountId || opts.assignee;
-        if (!(typeof assigneeIdOrName === "string" && assigneeIdOrName.length || assigneeIdOrName === null)) {
+        if (!((typeof assigneeIdOrName === "string" && assigneeIdOrName.length) || assigneeIdOrName === null)) {
             throw new Error(errorStrings.NO_ASSIGNEE_ERROR);
         }
-        var params = opts.accountId ? { accountId: opts.accountId } : { name: opts.assignee }
-        var options = this.buildRequestOptions(opts, '/assignee', 'PUT', params);
+        var params = opts.accountId ? { accountId: opts.accountId } : { name: opts.assignee };
+        var options = this.buildRequestOptions(opts, "/assignee", "PUT", params);
 
-        return this.jiraClient.makeRequest(options, callback, 'Issue Assigned');
+        return this.jiraClient.makeRequest(options, callback, "Issue Assigned");
     };
 
     /**
@@ -394,7 +392,7 @@ function IssueClient(jiraClient) {
      * @return {Promise} Resolved when the issue has been assigned.
      */
     this.getComments = function (opts, callback) {
-        var options = this.buildRequestOptions(opts, '/comment', 'GET');
+        var options = this.buildRequestOptions(opts, "/comment", "GET");
 
         return this.jiraClient.makeRequest(options, callback);
     };
@@ -418,12 +416,12 @@ function IssueClient(jiraClient) {
      */
     this.addComment = function (opts, callback) {
         var options = {
-            uri: this.jiraClient.buildURL('/issue/' + (opts.issueId || opts.issueKey) + '/comment'),
-            method: 'POST',
+            uri: this.jiraClient.buildURL("/issue/" + (opts.issueId || opts.issueKey) + "/comment"),
+            method: "POST",
             json: true,
             followAllRedirects: true,
             qs: {
-                expand: opts.expand
+                expand: opts.expand,
             },
             body: Object.assign(
                 {
@@ -436,9 +434,9 @@ function IssueClient(jiraClient) {
                     expand: undefined,
                     comment: undefined,
                     issueId: undefined,
-                    issueKey: undefined
-                }
-            )
+                    issueKey: undefined,
+                },
+            ),
         };
 
         return this.jiraClient.makeRequest(options, callback);
@@ -461,7 +459,7 @@ function IssueClient(jiraClient) {
         if (!opts.commentId) {
             throw new Error(errorStrings.NO_COMMENT_ID);
         }
-        var options = this.buildRequestOptions(opts, '/comment/' + opts.commentId, 'GET');
+        var options = this.buildRequestOptions(opts, "/comment/" + opts.commentId, "GET");
 
         return this.jiraClient.makeRequest(options, callback);
     };
@@ -486,7 +484,7 @@ function IssueClient(jiraClient) {
         } else if (!opts.commentId) {
             throw new Error(errorStrings.NO_COMMENT_ID);
         }
-        var options = this.buildRequestOptions(opts, '/comment/' + opts.commentId, 'PUT', opts.comment);
+        var options = this.buildRequestOptions(opts, "/comment/" + opts.commentId, "PUT", opts.comment);
 
         return this.jiraClient.makeRequest(options, callback);
     };
@@ -506,13 +504,13 @@ function IssueClient(jiraClient) {
      */
     this.deleteComment = function (opts, callback) {
         var options = {
-            uri: this.jiraClient.buildURL('/issue/' + (opts.issueId || opts.issueKey) + '/comment/' + opts.commentId),
-            method: 'DELETE',
+            uri: this.jiraClient.buildURL("/issue/" + (opts.issueId || opts.issueKey) + "/comment/" + opts.commentId),
+            method: "DELETE",
             json: true,
-            followAllRedirects: true
+            followAllRedirects: true,
         };
 
-        return this.jiraClient.makeRequest(options, callback, 'Comment Deleted');
+        return this.jiraClient.makeRequest(options, callback, "Comment Deleted");
     };
 
     /**
@@ -531,7 +529,7 @@ function IssueClient(jiraClient) {
      * @return {Promise} Resolved when the metadata is retrieved.
      */
     this.getEditMetadata = function (opts, callback) {
-        var options = this.buildRequestOptions(opts, '/editmeta', 'GET');
+        var options = this.buildRequestOptions(opts, "/editmeta", "GET");
 
         return this.jiraClient.makeRequest(options, callback);
     };
@@ -556,9 +554,9 @@ function IssueClient(jiraClient) {
             throw new Error(errorStrings.NO_NOTIFICATION_ERROR);
         }
 
-        var options = this.buildRequestOptions(opts, '/notify', 'POST', opts.notification);
+        var options = this.buildRequestOptions(opts, "/notify", "POST", opts.notification);
 
-        return this.jiraClient.makeRequest(options, callback, 'Notifications Sent');
+        return this.jiraClient.makeRequest(options, callback, "Notifications Sent");
     };
 
     /**
@@ -577,7 +575,7 @@ function IssueClient(jiraClient) {
      * @return {Promise} Resolved when the remote links are retrieved.
      */
     this.getRemoteLinks = function (opts, callback) {
-        var options = this.buildRequestOptions(opts, '/remotelink', 'GET', null, { globalId: opts.globalId });
+        var options = this.buildRequestOptions(opts, "/remotelink", "GET", null, { globalId: opts.globalId });
 
         return this.jiraClient.makeRequest(options, callback);
     };
@@ -597,7 +595,7 @@ function IssueClient(jiraClient) {
      * @return {Promise} Resolved when the remote links are retrieved.
      */
     this.createRemoteLink = function (opts, callback) {
-        var options = this.buildRequestOptions(opts, '/remotelink', 'POST', opts.remoteLink);
+        var options = this.buildRequestOptions(opts, "/remotelink", "POST", opts.remoteLink);
 
         return this.jiraClient.makeRequest(options, callback);
     };
@@ -639,9 +637,9 @@ function IssueClient(jiraClient) {
             throw new Error(errorStrings.NO_GLOBAL_ID_ERROR);
         }
 
-        var options = this.buildRequestOptions(opts, '/remotelink', 'DELETE', null, { globalId: opts.globalId });
+        var options = this.buildRequestOptions(opts, "/remotelink", "DELETE", null, { globalId: opts.globalId });
 
-        return this.jiraClient.makeRequest(options, callback, 'RemoteLink Deleted');
+        return this.jiraClient.makeRequest(options, callback, "RemoteLink Deleted");
     };
 
     /**
@@ -662,7 +660,7 @@ function IssueClient(jiraClient) {
             throw new Error(errorStrings.NO_LINK_ID_ERROR);
         }
 
-        var options = this.buildRequestOptions(opts, '/remotelink/' + opts.linkId, 'GET');
+        var options = this.buildRequestOptions(opts, "/remotelink/" + opts.linkId, "GET");
 
         return this.jiraClient.makeRequest(options, callback);
     };
@@ -686,9 +684,9 @@ function IssueClient(jiraClient) {
             throw new Error(errorStrings.NO_LINK_ID_ERROR);
         }
 
-        var options = this.buildRequestOptions(opts, '/remotelink/' + opts.linkId, 'PUT', opts.remoteLink);
+        var options = this.buildRequestOptions(opts, "/remotelink/" + opts.linkId, "PUT", opts.remoteLink);
 
-        return this.jiraClient.makeRequest(options, callback, 'RemoteLink Updated');
+        return this.jiraClient.makeRequest(options, callback, "RemoteLink Updated");
     };
 
     /**
@@ -709,9 +707,9 @@ function IssueClient(jiraClient) {
             throw new Error(errorStrings.NO_LINK_ID_ERROR);
         }
 
-        var options = this.buildRequestOptions(opts, '/remotelink/' + opts.linkId, 'DELETE');
+        var options = this.buildRequestOptions(opts, "/remotelink/" + opts.linkId, "DELETE");
 
-        return this.jiraClient.makeRequest(options, callback, 'RemoteLink Deleted');
+        return this.jiraClient.makeRequest(options, callback, "RemoteLink Deleted");
     };
 
     /**
@@ -734,7 +732,7 @@ function IssueClient(jiraClient) {
      * @return {Promise} Resolved when the transitions are retrieved.
      */
     this.getTransitions = function (opts, callback) {
-        var options = this.buildRequestOptions(opts, '/transitions', 'GET', null, { transitionId: opts.transitionId });
+        var options = this.buildRequestOptions(opts, "/transitions", "GET", null, { transitionId: opts.transitionId });
 
         return this.jiraClient.makeRequest(options, callback);
     };
@@ -754,18 +752,19 @@ function IssueClient(jiraClient) {
      * @param {string} [opts.issueId] The id of the issue.  EX: 10002
      * @param {string} [opts.issueKey] The Key of the issue.  EX: JWR-3
      * @param {object} [opts.transition] See {@link https://docs.atlassian.com/jira/REST/latest/#d2e698}
-     * @param {string} [opts.transition.id] The ID of the issue transition. Required when specifying a transition to undertake. 
+     * @param {string} [opts.transition.id] The ID of the issue transition. Required when specifying a transition to undertake.
      * @param [callback] Called when the transitions are retrieved.
      * @return {Promise} Resolved when the transitions are retrieved.
      */
     this.transitionIssue = function (opts, callback) {
         var options;
-        if (!opts.transition.transition) { // To keep backwards compatibility
-            options = this.buildRequestOptions(opts, '/transitions', 'POST', opts);
+        if (!opts.transition.transition) {
+            // To keep backwards compatibility
+            options = this.buildRequestOptions(opts, "/transitions", "POST", opts);
         } else {
-            options = this.buildRequestOptions(opts, '/transitions', 'POST', opts.transition)
+            options = this.buildRequestOptions(opts, "/transitions", "POST", opts.transition);
         }
-        return this.jiraClient.makeRequest(options, callback, 'Issue Transitioned');
+        return this.jiraClient.makeRequest(options, callback, "Issue Transitioned");
     };
 
     /**
@@ -781,9 +780,9 @@ function IssueClient(jiraClient) {
      * @return {Promise} Resolved after the vote is removed.
      */
     this.unvote = function (opts, callback) {
-        var options = this.buildRequestOptions(opts, '/votes', 'DELETE');
+        var options = this.buildRequestOptions(opts, "/votes", "DELETE");
 
-        return this.jiraClient.makeRequest(options, callback, 'Vote Removed');
+        return this.jiraClient.makeRequest(options, callback, "Vote Removed");
     };
 
     /**
@@ -799,9 +798,9 @@ function IssueClient(jiraClient) {
      * @return {Promise} Resolved after the vote is removed.
      */
     this.vote = function (opts, callback) {
-        var options = this.buildRequestOptions(opts, '/votes', 'POST');
+        var options = this.buildRequestOptions(opts, "/votes", "POST");
 
-        return this.jiraClient.makeRequest(options, callback, 'Vote Added');
+        return this.jiraClient.makeRequest(options, callback, "Vote Added");
     };
 
     /**
@@ -817,7 +816,7 @@ function IssueClient(jiraClient) {
      * @return {Promise} Resolved after the votes are retrieved.
      */
     this.getVotes = function (opts, callback) {
-        var options = this.buildRequestOptions(opts, '/votes', 'GET');
+        var options = this.buildRequestOptions(opts, "/votes", "GET");
 
         return this.jiraClient.makeRequest(options, callback);
     };
@@ -837,16 +836,16 @@ function IssueClient(jiraClient) {
      * @return {Promise} Resolved after the changelog is retrieved.
      */
     this.getChangelog = function (opts, callback) {
-        var endpoint = '/issue/' + (opts.issueId || opts.issueKey) + '/changelog';
+        var endpoint = "/issue/" + (opts.issueId || opts.issueKey) + "/changelog";
         var options = {
             uri: this.jiraClient.buildURL(endpoint),
-            method: 'GET',
+            method: "GET",
             json: true,
             followAllRedirects: true,
             qs: {
                 startAt: opts.startAt,
-                maxResults: opts.maxResults
-            }
+                maxResults: opts.maxResults,
+            },
         };
 
         return this.jiraClient.makeRequest(options, callback);
@@ -865,7 +864,7 @@ function IssueClient(jiraClient) {
      * @return {Promise} Resolved after the watchers are retrieved.
      */
     this.getWatchers = function (opts, callback) {
-        var options = this.buildRequestOptions(opts, '/watchers', 'GET');
+        var options = this.buildRequestOptions(opts, "/watchers", "GET");
 
         return this.jiraClient.makeRequest(options, callback);
     };
@@ -887,9 +886,9 @@ function IssueClient(jiraClient) {
         if (!opts.watcher) {
             throw new Error(errorStrings.NO_WATCHER_ERROR);
         }
-        var options = this.buildRequestOptions(opts, '/watchers', 'POST', opts.watcher);
+        var options = this.buildRequestOptions(opts, "/watchers", "POST", opts.watcher);
 
-        return this.jiraClient.makeRequest(options, callback, 'Watcher Added');
+        return this.jiraClient.makeRequest(options, callback, "Watcher Added");
     };
 
     /**
@@ -909,9 +908,9 @@ function IssueClient(jiraClient) {
         if (!opts.watcher) {
             throw new Error(errorStrings.NO_WATCHER_ERROR);
         }
-        var options = this.buildRequestOptions(opts, '/watchers', 'DELETE', null, { username: opts.watcher });
+        var options = this.buildRequestOptions(opts, "/watchers", "DELETE", null, { username: opts.watcher });
 
-        return this.jiraClient.makeRequest(options, callback, 'Watcher Removed');
+        return this.jiraClient.makeRequest(options, callback, "Watcher Removed");
     };
 
     /**
@@ -927,7 +926,7 @@ function IssueClient(jiraClient) {
      * @return {Promise} Resolved after the worklogs are retrieved.
      */
     this.getWorkLogs = function (opts, callback) {
-        var options = this.buildRequestOptions(opts, '/worklog', 'GET');
+        var options = this.buildRequestOptions(opts, "/worklog", "GET");
 
         return this.jiraClient.makeRequest(options, callback);
     };
@@ -957,8 +956,8 @@ function IssueClient(jiraClient) {
      */
     this.addWorkLog = function (opts, callback) {
         var options = {
-            uri: this.jiraClient.buildURL('/issue/' + (opts.issueId || opts.issueKey) + '/worklog'),
-            method: 'POST',
+            uri: this.jiraClient.buildURL("/issue/" + (opts.issueId || opts.issueKey) + "/worklog"),
+            method: "POST",
             json: true,
             followAllRedirects: true,
             qs: {
@@ -967,21 +966,23 @@ function IssueClient(jiraClient) {
                 newEstimate: opts.newEstimate,
                 reduceBy: opts.reduceBy,
                 expand: opts.expand,
-                overrideEditableFlag: opts.overrideEditableFlag
+                overrideEditableFlag: opts.overrideEditableFlag,
             },
-            body: opts.worklog || Object.assign(opts, {
-                issueId: undefined,
-                issueKey: undefined,
-                notifyUsers: undefined,
-                adjustEstimate: undefined,
-                newEstimate: undefined,
-                reduceBy: undefined,
-                expand: undefined,
-                overrideEditableFlag: undefined
-            })
+            body:
+                opts.worklog ||
+                Object.assign(opts, {
+                    issueId: undefined,
+                    issueKey: undefined,
+                    notifyUsers: undefined,
+                    adjustEstimate: undefined,
+                    newEstimate: undefined,
+                    reduceBy: undefined,
+                    expand: undefined,
+                    overrideEditableFlag: undefined,
+                }),
         };
 
-        return this.jiraClient.makeRequest(options, callback, 'Worklog Added');
+        return this.jiraClient.makeRequest(options, callback, "Worklog Added");
     };
 
     /**
@@ -999,13 +1000,13 @@ function IssueClient(jiraClient) {
      */
     this.getWorkLog = function (opts, callback) {
         var options = {
-            uri: this.jiraClient.buildURL('/issue/' + (opts.issueId || opts.issueKey) + '/worklog/' + (opts.id || opts.worklogId)),
-            method: 'GET',
+            uri: this.jiraClient.buildURL("/issue/" + (opts.issueId || opts.issueKey) + "/worklog/" + (opts.id || opts.worklogId)),
+            method: "GET",
             json: true,
             followAllRedirects: true,
             qs: {
-                expand: opts.expand
-            }
+                expand: opts.expand,
+            },
         };
 
         return this.jiraClient.makeRequest(options, callback);
@@ -1035,8 +1036,8 @@ function IssueClient(jiraClient) {
      */
     this.updateWorkLog = function (opts, callback) {
         var options = {
-            uri: this.jiraClient.buildURL('/issue/' + (opts.issueId || opts.issueKey) + '/worklog/' + (opts.id || opts.worklogId)),
-            method: 'PUT',
+            uri: this.jiraClient.buildURL("/issue/" + (opts.issueId || opts.issueKey) + "/worklog/" + (opts.id || opts.worklogId)),
+            method: "PUT",
             json: true,
             followAllRedirects: true,
             qs: {
@@ -1044,7 +1045,7 @@ function IssueClient(jiraClient) {
                 adjustEstimate: opts.adjustEstimate,
                 newEstimate: opts.newEstimate,
                 expand: opts.expand,
-                overrideEditableFlag: opts.overrideEditableFlag
+                overrideEditableFlag: opts.overrideEditableFlag,
             },
             body: Object.assign(opts, {
                 issueId: undefined,
@@ -1053,8 +1054,8 @@ function IssueClient(jiraClient) {
                 adjustEstimate: undefined,
                 newEstimate: undefined,
                 expand: undefined,
-                overrideEditableFlag: undefined
-            })
+                overrideEditableFlag: undefined,
+            }),
         };
 
         return this.jiraClient.makeRequest(options, callback);
@@ -1086,8 +1087,8 @@ function IssueClient(jiraClient) {
      */
     this.deleteWorkLog = function (opts, callback) {
         var options = {
-            uri: this.jiraClient.buildURL('/issue/' + (opts.issueId || opts.issueKey) + '/worklog/' + (opts.id || opts.worklogId)),
-            method: 'DELETE',
+            uri: this.jiraClient.buildURL("/issue/" + (opts.issueId || opts.issueKey) + "/worklog/" + (opts.id || opts.worklogId)),
+            method: "DELETE",
             json: true,
             followAllRedirects: true,
             qs: {
@@ -1095,11 +1096,11 @@ function IssueClient(jiraClient) {
                 adjustEstimate: opts.adjustEstimate,
                 newEstimate: opts.newEstimate,
                 increaseBy: opts.increaseBy,
-                overrideEditableFlag: opts.overrideEditableFlag
-            }
+                overrideEditableFlag: opts.overrideEditableFlag,
+            },
         };
 
-        return this.jiraClient.makeRequest(options, callback, 'Work Log Deleted');
+        return this.jiraClient.makeRequest(options, callback, "Work Log Deleted");
     };
 
     /**
@@ -1117,33 +1118,32 @@ function IssueClient(jiraClient) {
      * @return {Promise} Resolved when the attachment has been attached.
      */
     this.addAttachment = function (opts, callback) {
-        var filename = Array.isArray(opts.filename) ? opts.filename : [opts.filename];
-        var attachments = filename.map(function (filePath) {
-            var filename = filePath.split('/').reverse()[0];
-            var mimeType = mime.lookup(filename);
-            return {
-                value: fs.createReadStream(filePath),
-                options: {
-                    filename: filename,
-                    contentType: mimeType
-                }
-            }
-        });
+        var fileItems = Array.isArray(opts.filename) ? opts.filename : [opts.filename];
 
-        var headers = {
-            charset: 'utf-8',
-            'X-Atlassian-Token': 'nocheck'
+        let dataForm = new FormData();
+
+        for (const fileItem of fileItems) {
+            const filename2 = fileItem.split("/").reverse()[0];
+
+            if (typeof File !== "undefined" && !!File && !fs && fileItem instanceof File) {
+                dataForm.append("file", fileItem);
+            } else {
+                dataForm.append("file", fs.createReadStream(fileItem), filename2);
+            }
         }
 
+        var headers = {
+            charset: "utf-8",
+            "X-Atlassian-Token": "nocheck",
+        };
+
         var options = {
-            uri: this.jiraClient.buildURL('/issue/' + (opts.issueId || opts.issueKey) + '/attachments'),
-            method: 'POST',
+            uri: this.jiraClient.buildURL("/issue/" + (opts.issueId || opts.issueKey) + "/attachments"),
+            method: "POST",
             json: true,
             followAllRedirects: true,
-            headers: Object.assign(headers, opts.headers || {}),
-            formData: {
-                file: attachments
-            }
+            headers: dataForm.getHeaders(Object.assign(headers, opts.headers || {})),
+            data: dataForm,
         };
 
         return this.jiraClient.makeRequest(options, callback);
@@ -1163,7 +1163,7 @@ function IssueClient(jiraClient) {
      * @return {Promise} Resolved when the properties are retrieved.
      */
     this.getProperties = function (opts, callback) {
-        var options = this.buildRequestOptions(opts, '/properties', 'GET');
+        var options = this.buildRequestOptions(opts, "/properties", "GET");
         return this.jiraClient.makeRequest(options, callback);
     };
 
@@ -1191,8 +1191,8 @@ function IssueClient(jiraClient) {
         } else if (!opts.propertyValue) {
             throw new Error(errorStrings.NO_PROPERTY_VALUE_ERROR);
         }
-        var options = this.buildRequestOptions(opts, '/properties/' + opts.propertyKey, 'PUT', opts.propertyValue);
-        return this.jiraClient.makeRequest(options, callback, 'Property Set');
+        var options = this.buildRequestOptions(opts, "/properties/" + opts.propertyKey, "PUT", opts.propertyValue);
+        return this.jiraClient.makeRequest(options, callback, "Property Set");
     };
 
     /**
@@ -1215,7 +1215,7 @@ function IssueClient(jiraClient) {
         if (!opts.propertyKey) {
             throw new Error(errorStrings.NO_PROPERTY_KEY_ERROR);
         }
-        var options = this.buildRequestOptions(opts, '/properties/' + opts.propertyKey, 'GET');
+        var options = this.buildRequestOptions(opts, "/properties/" + opts.propertyKey, "GET");
         return this.jiraClient.makeRequest(options, callback);
     };
 
@@ -1239,8 +1239,8 @@ function IssueClient(jiraClient) {
         if (!opts.propertyKey) {
             throw new Error(errorStrings.NO_PROPERTY_KEY_ERROR);
         }
-        var options = this.buildRequestOptions(opts, '/properties/' + opts.propertyKey, 'DELETE');
-        return this.jiraClient.makeRequest(options, callback, 'Property Deleted');
+        var options = this.buildRequestOptions(opts, "/properties/" + opts.propertyKey, "DELETE");
+        return this.jiraClient.makeRequest(options, callback, "Property Deleted");
     };
 
     this.setWorklogProperty = function (opts, callback) {
@@ -1249,21 +1249,12 @@ function IssueClient(jiraClient) {
         } else if (!opts.propertyValue) {
             throw new Error(errorStrings.NO_PROPERTY_VALUE_ERROR);
         }
-        var options = this.buildRequestOptions(
-            opts,
-            '/worklog/' + opts.worklogId + '/properties/' + opts.propertyKey,
-            'PUT',
-            opts.propertyValue
-        );
-        return this.jiraClient.makeRequest(options, callback, 'Property Set');
+        var options = this.buildRequestOptions(opts, "/worklog/" + opts.worklogId + "/properties/" + opts.propertyKey, "PUT", opts.propertyValue);
+        return this.jiraClient.makeRequest(options, callback, "Property Set");
     };
 
     this.getWorkLogProperties = function (opts, callback) {
-        var options = this.buildRequestOptions(
-            opts,
-            '/worklog/' + opts.worklogId + '/properties/',
-            'GET'
-        );
+        var options = this.buildRequestOptions(opts, "/worklog/" + opts.worklogId + "/properties/", "GET");
         return this.jiraClient.makeRequest(options, callback);
     };
 
@@ -1271,11 +1262,7 @@ function IssueClient(jiraClient) {
         if (!opts.propertyKey) {
             throw new Error(errorStrings.NO_PROPERTY_KEY_ERROR);
         }
-        var options = this.buildRequestOptions(
-            opts,
-            '/worklog/' + opts.worklogId + '/properties/' + opts.propertyKey,
-            'GET'
-        );
+        var options = this.buildRequestOptions(opts, "/worklog/" + opts.worklogId + "/properties/" + opts.propertyKey, "GET");
         return this.jiraClient.makeRequest(options, callback);
     };
 
@@ -1296,28 +1283,28 @@ function IssueClient(jiraClient) {
             throw new Error(errorStrings.NO_ISSUE_IDENTIFIER);
         }
         var idOrKey = opts.issueId || opts.issueKey;
-        var basePath = '/issue/' + idOrKey;
+        var basePath = "/issue/" + idOrKey;
         if (!qs) qs = {};
         if (!body) body = {};
 
         if (opts.fields) {
-            qs.fields = '';
+            qs.fields = "";
             opts.fields.forEach(function (field) {
-                qs.fields += field + ','
+                qs.fields += field + ",";
             });
         }
 
         if (opts.expand) {
-            qs.expand = '';
+            qs.expand = "";
             opts.expand.forEach(function (ex) {
-                qs.expand += ex + ','
+                qs.expand += ex + ",";
             });
         }
 
         if (opts.properties) {
-            qs.properties = '';
+            qs.properties = "";
             opts.properties.forEach(function (prop) {
-                qs.properties += prop + ','
+                qs.properties += prop + ",";
             });
         }
 
@@ -1327,43 +1314,43 @@ function IssueClient(jiraClient) {
             body: body,
             qs: qs,
             followAllRedirects: true,
-            json: true
+            json: true,
         };
-    }
+    };
 
     /**
-     * Returns suggested issues which match the auto-completion query for the 
-     * user which executes this request. This REST method will check the user's 
-     * history and the user's browsing context and select this issues, which 
+     * Returns suggested issues which match the auto-completion query for the
+     * user which executes this request. This REST method will check the user's
+     * history and the user's browsing context and select this issues, which
      * match the query.
      *
      * @method getIssuePicker
      * @memberOf IssueClient#
      * @param {Object} opts The options to pass to the API.
      * @param {string} [opts.query] the query
-     * @param {string} [opts.currentJQL] the JQL in context of which the request 
-     *                 is executed. Only issues which match this JQL query will be 
+     * @param {string} [opts.currentJQL] the JQL in context of which the request
+     *                 is executed. Only issues which match this JQL query will be
      *                 included in results.
-     * @param {string} [opts.currentIssueKey] the key of the issue in context of 
-     *                 which the request is executed. The issue which is in context 
-     *                 will not be included in the auto-completion result, even if 
+     * @param {string} [opts.currentIssueKey] the key of the issue in context of
+     *                 which the request is executed. The issue which is in context
+     *                 will not be included in the auto-completion result, even if
      *                 it matches the query.
-     * @param {string} [opts.currentProjectId] the id of the project in context of 
-     *                 which the request is executed. Suggested issues will be only 
+     * @param {string} [opts.currentProjectId] the id of the project in context of
+     *                 which the request is executed. Suggested issues will be only
      *                 from this project.
-     * @param {boolean} [opts.showSubTasks] if set to false, subtasks will not be 
+     * @param {boolean} [opts.showSubTasks] if set to false, subtasks will not be
      *                  included in the list.
-     * @param {boolean} [opts.showSubTaskParent] if set to false and request is 
-     *                  executed in context of a subtask, the parent issue will 
-     *                  not be included in the auto-completion result, even if it 
+     * @param {boolean} [opts.showSubTaskParent] if set to false and request is
+     *                  executed in context of a subtask, the parent issue will
+     *                  not be included in the auto-completion result, even if it
      *                  matches the query.
      * @param [callback] Called when the issues have been retrieved.
      * @return {Promise} Resolved when the issues have been retrieved.
      */
     this.getIssuePicker = function (opts, callback) {
         var options = {
-            uri: this.jiraClient.buildURL('/issue/picker'),
-            method: 'GET',
+            uri: this.jiraClient.buildURL("/issue/picker"),
+            method: "GET",
             json: true,
             followAllRedirects: true,
             qs: {
@@ -1372,11 +1359,10 @@ function IssueClient(jiraClient) {
                 currentIssueKey: opts.currentIssueKey,
                 currentProjectId: opts.currentProjectId,
                 showSubTasks: opts.showSubTasks,
-                showSubTaskParent: opts.showSubTaskParent
-            }
+                showSubTaskParent: opts.showSubTaskParent,
+            },
         };
 
         return this.jiraClient.makeRequest(options, callback);
     };
-
 }
