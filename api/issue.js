@@ -1,7 +1,15 @@
 "use strict";
-var fs = eval('require')("fs"); // Should be null if used in browser
+var optRequire = undefined;
+try {
+  optRequire = eval('typeof require === "object" ? require : undefined');
+} catch (e) {}
+if(!optRequire) {
+  optRequire = ()=>undefined;
+}
+
+var fs = optRequire("fs"); // Should be null if used in browser
 if (typeof FormData === "undefined") { // Should not enter here if used in browser
-    global.FormData = eval('require')("form-data");
+    global.FormData = optRequire("form-data");
 }
 
 var errorStrings = require("./../lib/error");
