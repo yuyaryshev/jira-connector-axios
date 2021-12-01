@@ -34,8 +34,11 @@
         "url": "git@github.com:floralvikings/jira-connector.git"
     },
     "devDependencies": {
+        "chai": "^4.3.4",
         "jira-connector": "^3.1.0",
+        "mocha": "^9.1.3",
         "prettier": "^2.4.1",
+        "source-map-support": "^0.5.21",
         "web-proxy-sniffer": "^1.1.0",
         "yuyaryshev-cors-anywhere": "^0.4.4"
     }

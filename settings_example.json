@@ -1,0 +1,15 @@
+{
+  "testConnection": {
+    "host": "host",
+    "port": 80,
+    "protocol": "http",
+    "basic_auth": {
+      "username": "username",
+      "password": "password"
+    },
+    "strictSSL": false
+  },
+  "testProject": "PRJ",
+  "testIssue": "PRJ-1",
+  "testUser":"username"
+}

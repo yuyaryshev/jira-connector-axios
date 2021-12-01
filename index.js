@@ -444,6 +444,7 @@ function removePasswords(obj) {
      */
     this.makeRequest = function (options, callback, successString) {
         options.url = options.uri;
+        options.params =  options.qs;
         options.rejectUnauthorized = this.rejectUnauthorized;
         options.strictSSL = this.strictSSL;
         options.timeout = this.timeout;
